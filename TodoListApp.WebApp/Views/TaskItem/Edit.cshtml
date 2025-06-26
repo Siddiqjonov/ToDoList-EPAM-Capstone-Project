@@ -1,0 +1,54 @@
+@model TodoListApp.WebApi.Models.Dtos.TaskItemDtos.TaskItemUpdateDto
+
+@{
+    ViewData["Title"] = "Edit Task";
+    var toDoListId = ViewBag.TodoListId;
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Edit Task</h2>
+        <hr />
+        <form asp-controller="TaskItem" asp-action="Edit" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Hidden inputs to keep the IDs -->
+            <input asp-for="TaskItemId" type="hidden" />
+            <input asp-for="TodoListId" type="hidden" />
+
+            <div class="form-group mb-3">
+                <div class="form-label"><span>Title</span></div>
+                <input asp-for="Title" class="form-control" id="Title" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="form-label"><span>Description</span></div>
+                <textarea asp-for="Description" class="form-control" id="Description" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <div class="form-label"><span>Due Date</span></div>
+                <input asp-for="DueDate" class="form-control" type="datetime-local"
+                       value="@(Model.DueDate?.ToString("yyyy-MM-ddTHH:mm"))" id="DueDate" />
+                <span asp-validation-for="DueDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3 form-check">
+                <input asp-for="IsCompleted" class="form-check-input" id="IsCompleted" />
+                <span class="form-check-label">Is Completed</span>
+                <span asp-validation-for="IsCompleted" class="text-danger d-block"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary">Update Task</button>
+                <a asp-action="Index" asp-route-toDoListId="@toDoListId" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,25 @@
+body {
+    padding-top: 0;
+    padding-bottom: 20px;
+}
+
+.navbar {
+    margin-bottom: 20px;
+}
+
+.footer {
+    padding: 10px 0;
+    text-align: center;
+}
+
+.alert {
+    margin-top: 10px;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+.btn-sm {
+    margin-right: 5px;
+}

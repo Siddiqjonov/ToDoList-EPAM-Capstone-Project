@@ -1,0 +1,36 @@
+@model TodoListApp.WebApi.Models.Dtos.TagDtos.TagCreateDto
+@{
+    ViewData["Title"] = "Create Tag";
+    var taskId = ViewBag.TaskId;
+    var toDoListId = ViewBag.TodoListId;
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Create Tag</h2>
+        <hr />
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" name="taskId" value="@taskId" />
+            <input type="hidden" name="toDoListId" value="@toDoListId" />
+
+            <div class="form-group mb-3">
+                <input asp-for="Name" class="form-control" placeholder="Tag Name" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary">Create Tag</button>
+                <a asp-controller="TaskItem"
+                   asp-action="Index"
+                   asp-route-toDoListId="@toDoListId"
+                   class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

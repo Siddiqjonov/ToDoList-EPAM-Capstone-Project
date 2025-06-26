@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "TodoListApp.DataAccess": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,85 @@
+@model IEnumerable<TodoListApp.WebApi.Models.Dtos.CommentDtos.CommentGetDto>
+@{
+    ViewData["Title"] = "Comments";
+    var taskId = ViewBag.TaskId;
+    var toDoListId = ViewBag.ToDoListId;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">💬 Comments</h2>
+        <div class="d-flex gap-2">
+            <a asp-action="Create"
+               asp-route-taskId="@taskId"
+               asp-route-toDoListId="@toDoListId"
+               class="btn btn-success">
+                ➕ Add Comment
+            </a>
+            <a asp-controller="TaskItem"
+               asp-action="Index"
+               asp-route-toDoListId="@toDoListId"
+               class="btn btn-outline-secondary">
+                🔙 Back to Tasks
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">No comments available.</div>
+    }
+    else
+    {
+        <style>
+            .comment-btn {
+                transition: background-color 0.2s, color 0.2s;
+                margin-left: 6px;
+                padding: 4px 10px;
+            }
+
+                .comment-btn:hover {
+                    opacity: 0.9;
+                    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+                }
+
+            .btn-warning:hover {
+                background-color: #f0ad4e;
+                color: white;
+            }
+
+            .btn-danger:hover {
+                background-color: #dc3545;
+                color: white;
+            }
+        </style>
+
+        <div class="list-group">
+            @foreach (var comment in Model)
+            {
+                <div class="list-group-item shadow-sm rounded mb-3 p-3 me-3">
+                    <p class="mb-1">@comment.Content</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">🕓 Posted on @comment.CreatedAt.ToString("g")</small>
+                        <div class="d-flex">
+                            <a asp-action="Edit"
+                               asp-route-commentId="@comment.CommentId"
+                               asp-route-content="@comment.Content"
+                               asp-route-taskId="@taskId"
+                               class="btn btn-warning comment-btn">
+                                ✏️
+                            </a>
+                            <form asp-action="Delete"
+                                  method="post"
+                                  asp-route-commentId="@comment.CommentId"
+                                  asp-route-taskId="@taskId"
+                                  asp-route-toDoListId="@toDoListId"
+                                  onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                <button type="submit" class="btn btn-danger comment-btn">🗑️</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

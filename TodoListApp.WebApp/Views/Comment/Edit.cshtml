@@ -1,0 +1,48 @@
+@model TodoListApp.WebApi.Models.Dtos.CommentDtos.CommentUpdateDto
+
+@{
+    ViewData["Title"] = "Edit Comment";
+    var toDoListId = ViewBag.TodoListId;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="text-center mb-4">✏️ Edit Comment</h3>
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="CommentId" />
+                    <input type="hidden" asp-for="TaskItemId" />
+                    <input type="hidden" name="toDoListId" value="@toDoListId" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+                    <div class="form-group mb-3">
+                        <textarea asp-for="Content"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Edit your comment..."></textarea>
+                        <span asp-validation-for="Content" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="submit" class="btn btn-success px-4">💾 Save</button>
+                        <a asp-action="Index"
+                           asp-route-taskId="@Model.TaskItemId"
+                           asp-route-toDoListId="@toDoListId"
+                           class="btn btn-outline-secondary px-4">
+                            🔙 Cancel
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

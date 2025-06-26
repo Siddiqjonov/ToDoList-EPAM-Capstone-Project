@@ -1,0 +1,39 @@
+@model IEnumerable<TodoListApp.WebApi.Models.Dtos.TagDtos.TagGetDto>
+@{
+    ViewData["Title"] = "Tags";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h2>Tags</h2>
+        <p>
+            <a asp-controller="TodoList" asp-action="Index" class="btn btn-secondary">Back to Todo Lists</a>
+        </p>
+        @if (!Model.Any())
+        {
+            <p>No tags available.</p>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var tag in Model)
+                    {
+                        <tr>
+                            <td>@tag.Name</td>
+                            <td>
+                                <a asp-controller="TaskItem" asp-action="Index" asp-route-tagId="@tag.TagId" class="btn btn-sm btn-info">View Tasks</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

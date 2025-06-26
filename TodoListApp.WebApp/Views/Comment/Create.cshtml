@@ -1,0 +1,30 @@
+@model TodoListApp.WebApi.Models.Dtos.CommentDtos.CommentCreateDto
+@{
+    ViewData["Title"] = "Add Comment";
+    var taskId = Model.TaskItemId;
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <h2 class="mb-3">Add Comment</h2>
+        <form asp-action="Create" asp-controller="Comment" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="TaskItemId" />
+
+            <div class="form-group mb-3">
+                <textarea asp-for="Content" class="form-control" placeholder="Write your comment here..." rows="4"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <button type="submit" class="btn btn-primary">💬 Add</button>
+                <a asp-action="Index" asp-route-taskId="@taskId" class="btn btn-secondary">🔙 Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

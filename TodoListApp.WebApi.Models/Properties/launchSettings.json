@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "TodoListApp.WebApi.Models": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -1,0 +1,204 @@
+@model IEnumerable<TodoListApp.WebApi.Models.Dtos.TaskItemDtos.TaskItemGetDto>
+@{
+    ViewData["Title"] = "Tasks";
+    var searchTitle = ViewBag.SearchTitle as string;
+    var searchCreatedDate = ViewBag.SearchCreatedDate as DateTime?;
+    var searchDueDate = ViewBag.SearchDueDate as DateTime?;
+}
+
+<style>
+    table.fixed-table {
+        table-layout: fixed;
+        width: 100%;
+    }
+
+    .fixed-table th,
+    .fixed-table td {
+        white-space: normal; /* allow wrap */
+        word-break: break-word; /* break long words */
+    }
+
+    .title-col,
+    .desc-col {
+        white-space: normal;
+        word-break: break-word;
+        color: #0d6efd;
+    }
+
+
+    .desc-col {
+        width: 30%;
+        color: #0d6efd;
+    }
+
+    .due-col {
+        width: 15%;
+    }
+
+    .status-col {
+        width: 10%;
+    }
+
+    .action-col {
+        width: 20%;
+    }
+
+    .btn-action {
+        padding: 4px 8px;
+        font-size: 14px;
+        border-radius: 6px;
+        margin: 0 2px;
+    }
+</style>
+
+<h2>Tasks</h2>
+
+<div class="d-flex gap-2 mb-3">
+    <a asp-action="Create" asp-route-toDoListId="@ViewBag.TodoListId" class="btn btn-primary">➕ Add Task</a>
+    <a asp-controller="TodoList" asp-action="Index" class="btn btn-secondary">🔙 Go Back</a>
+</div>
+
+<form asp-action="Search" method="get" class="mb-3 row">
+    <div class="col-md-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" id="title" name="title" class="form-control" placeholder="Title" value="@searchTitle" />
+    </div>
+    <div class="col-md-3">
+        <label for="createdDate" class="form-label">Created Date</label>
+        <input type="date" id="createdDate" name="createdDate" class="form-control" value="@(searchCreatedDate?.ToString("yyyy-MM-dd"))" />
+    </div>
+    <div class="col-md-3">
+        <label for="dueDate" class="form-label">Due Date</label>
+        <input type="date" id="dueDate" name="dueDate" class="form-control" value="@(searchDueDate?.ToString("yyyy-MM-dd"))" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end gap-2">
+        <button class="btn btn-info">🔍 Search</button>
+        <a asp-action="Index" class="btn btn-secondary">❌ Clear</a>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <p>No tasks found.</p>
+}
+else
+{
+    <table class="table table-sm table-bordered table-striped fixed-table">
+        <thead>
+            <tr>
+                <th class="text-center" style="width: 5%;">Toggle</th>
+                <th class="title-col">Title</th>
+                <th class="desc-col">Description</th>
+                <th class="due-col">Due</th>
+                <th class="status-col">Status</th>
+                <th class="action-col">Actions</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr class ="text-center">
+                    <td>
+                        <form asp-action="UpdateTaskStatus"
+                              method="post"
+                              style="display:inline;"
+                              asp-route-taskId="@t.TaskItemId"
+                              asp-route-isCompleted="@(!t.IsCompleted)">
+                            <button type="submit" class="btn btn-sm btn-outline-success" title="Toggle Status">
+                                @(t.IsCompleted ? "✅" : "🔘")
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <span class="cell-hover" title="@t.Title">@t.Title</span>
+                    </td>
+                    <td>
+                        <span class="cell-hover" title="@t.Description">@t.Description</span>
+                    </td>
+                    <td>@(t.DueDate?.ToString("g"))</td>
+                    <td>
+                        @(t.IsCompleted ? "✅" : "⏳")
+                        @if (t.IsOverdue)
+                        {
+                            <span class="badge bg-danger">Overdue</span>
+                        }
+                    </td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-sm btn-info btn-action"
+                                onclick="showDetails('@t.Title', '@t.Description', '@(t.DueDate?.ToString("g"))', '@(t.IsCompleted ? "Completed ✅" : "Not Completed ⏳")', '@(t.IsOverdue ? "Yes 🔥" : "No")', '@(t.CreatedDate.ToString("g"))')">
+                            👁
+                        </button>
+                        <a asp-action="Edit"
+                           asp-route-taskId="@t.TaskItemId"
+                           asp-route-toDoListId="@t.TodoListId"
+                           class="btn btn-sm btn-warning btn-action">✏️</a>
+                        <a asp-controller="Comment" asp-action="Index" asp-route-taskId="@t.TaskItemId" class="btn btn-sm btn-secondary btn-action">💬</a>
+                        <a asp-controller="Tag"
+                           asp-action="Create"
+                           asp-route-taskId="@t.TaskItemId"
+                           asp-route-toDoListId="@ViewBag.ToDoListId"
+                           class="btn btn-sm btn-primary btn-action">
+                            🏷️
+                        </a>
+                        <form asp-controller="TaskItem"
+                              asp-action="Delete"
+                              asp-route-taskId="@t.TaskItemId"
+                              method="post"
+                              style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this task?');">
+                            <button type="submit" class="btn btn-sm btn-danger btn-action">🗑️</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- Modal for task details -->
+<div class="modal fade" id="taskDetailModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Task Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Title:</strong> <span id="modalTaskTitle"></span></p>
+                <p><strong>Description:</strong> <span id="modalTaskDescription"></span></p>
+                <p><strong>Due Date:</strong> <span id="modalTaskDue"></span></p>
+                <p><strong>Status:</strong> <span id="modalTaskStatus"></span></p>
+                <p><strong>Overdue:</strong> <span id="modalTaskOverdue"></span></p>
+                <p><strong>Created Date:</strong> <span id="modalTaskCreated"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateTaskStatus(taskId, isCompleted) {
+            $.get('@Url.Action("UpdateStatus", "TaskItem")', { taskId, isCompleted })
+                .done(() => location.reload())
+                .fail(() => alert('Failed to update status.'));
+        }
+
+        function showDetails(title, description, dueDate, status, overdue, createdDate) {
+            document.getElementById("modalTaskTitle").innerText = title;
+            document.getElementById("modalTaskDescription").innerText = description;
+            document.getElementById("modalTaskDue").innerText = dueDate;
+            document.getElementById("modalTaskStatus").innerText = status;
+            document.getElementById("modalTaskOverdue").innerText = overdue;
+            document.getElementById("modalTaskCreated").innerText = createdDate;
+
+            const modal = new bootstrap.Modal(document.getElementById('taskDetailModal'));
+            modal.show();
+        }
+    </script>
+}
+
+
+
+
